@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Domain.Orders;
 using Domain.Users;
+using Domain.Products;
+using Domain.Carts;
+
 
 namespace Domain;
 
