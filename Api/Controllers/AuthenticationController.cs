@@ -37,25 +37,20 @@ public class AuthenticationController : ControllerBase
             
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-        // Creating a new user entity
+        // Creating a new user entity with an associated cart (required navigation property)
         var newUser = new User
         {
             UserName = request.UserName,
             Email = request.Email,
-            Password = passwordHash
+            Password = passwordHash,
+            Cart = new Cart
+            {
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
         };
 
         _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-
-        var newCart = new Cart
-        {
-            UserId = newUser.UserId,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-
-        _context.Carts.Add(newCart);
         await _context.SaveChangesAsync();
         
         _logger.LogInformation("New user registered: {Username}", newUser.UserName);
