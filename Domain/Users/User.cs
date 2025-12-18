@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using Domain.Carts;
+using Domain.Orders;
 
 namespace Domain.Users;
 
@@ -17,4 +19,11 @@ public class User
     [Required]
     [MinLength(6)]
     public string Password  { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public virtual Cart? Cart { get; set; }
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }
