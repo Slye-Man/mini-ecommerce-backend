@@ -3,6 +3,7 @@ using Api.DTO;
 using Domain;
 using Domain.Carts;
 using Domain.Users;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,49 +15,38 @@ public class AuthenticationController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<AuthenticationController> _logger;
+    private readonly IAuthService _authService;
 
     public AuthenticationController(
         ApplicationDbContext context,
-        ILogger<AuthenticationController> logger)
+        ILogger<AuthenticationController> logger,
+        IAuthService authService)
     {
         _context = context;
         _logger = logger;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            return BadRequest("Email already exists.");
-
-        if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
-            return BadRequest("Username already exists.");
-            
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-        // Creating a new user entity with an associated cart (required navigation property)
-        var newUser = new User
+        try 
         {
-            UserName = request.UserName,
-            Email = request.Email,
-            Password = passwordHash,
-            Cart = new Cart
-            {
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
-        };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-        
-        _logger.LogInformation("New user registered: {Username}", newUser.UserName);
-        
-        // return Ok("Registration successful.");
-        return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser);
+            var authResponse = await _authService.RegisterUser(request);
+            return Ok(authResponse);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during registration");
+            return StatusCode(500, new { message = "Internal server error" });
+        }
     }
     
     [HttpPost("login")]
