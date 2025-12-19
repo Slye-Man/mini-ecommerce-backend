@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Domain.Carts;
 using Domain.Orders;
 
@@ -18,7 +19,8 @@ public class User
     
     [Required]
     [MinLength(6)]
-    public string Password  { get; set; }
+    [JsonIgnore]
+    public string Password { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
