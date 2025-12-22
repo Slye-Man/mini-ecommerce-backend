@@ -41,7 +41,7 @@ public class AuthService : IAuthService
        {
            Email = register.Email,
            UserName = register.UserName,
-           Password = register.Password,
+           Password = BCrypt.Net.BCrypt.HashPassword(register.Password),
            CreatedAt = DateTime.UtcNow,
            UpdatedAt = DateTime.UtcNow
        };
@@ -53,6 +53,7 @@ public class AuthService : IAuthService
        var newCart = new Cart
        {
            User = newUser,
+           Description = "Default Cart",
            CreatedAt = DateTime.UtcNow,
            UpdatedAt = DateTime.UtcNow
        };
