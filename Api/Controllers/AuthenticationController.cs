@@ -55,15 +55,31 @@ public class AuthenticationController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.UserName == request.Username || u.Email == request.Username);
+        try
+        {
+            var user = await _authService.LoginUser(request);
 
-        if (user == null) return Unauthorized("Invalid username or password.");
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddHours(1)
+            };
 
-        var valid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
-        if (!valid) return Unauthorized("Invalid username or password.");
+            if (!string.IsNullOrEmpty(user.SessionId))
+            {
+                Response.Cookies.Append("SessionId", user.SessionId, cookieOptions);
+            }
+            
+            return Ok(new { Message = "Login successful", UserId = user.UserId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized("Invalid username or password.");
+        }
 
-        return Ok(new { Message = "Login successful", UserId = user.UserId });
     }
 
     [HttpGet("{id}")]
