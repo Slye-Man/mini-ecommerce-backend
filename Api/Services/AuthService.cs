@@ -41,7 +41,7 @@ public class AuthService : IAuthService
        {
            Email = register.Email,
            UserName = register.UserName,
-           Password = BCrypt.Net.BCrypt.HashPassword(register.Password),
+           Password = passwordHash,
            CreatedAt = DateTime.UtcNow,
            UpdatedAt = DateTime.UtcNow
        };
