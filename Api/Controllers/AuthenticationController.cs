@@ -82,6 +82,34 @@ public class AuthenticationController : ControllerBase
 
     }
 
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            // Get session ID from cookie
+            var sessionId = Request.Cookies["sessionId"];
+
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return BadRequest(new { message = "No active session found" });
+            }
+
+            // Remove session (CSRF VULNERABLE - no token validation)
+            await _authService.LogoutUser(sessionId);
+
+            // Delete cookie
+            Response.Cookies.Delete("sessionId");
+
+            return Ok(new { message = "Logout successful" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in logout endpoint");
+            return StatusCode(500, new { message = "An error occurred during logout" });
+        }
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUser(int id)
     {
