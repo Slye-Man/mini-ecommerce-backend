@@ -1,3 +1,4 @@
+using Api.Middleware;
 using Microsoft.OpenApi.Models;
 using Domain;
 using Microsoft.AspNetCore.Builder;
@@ -54,6 +55,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCustomAuthentication();
 
 app.UseSwagger();
 
