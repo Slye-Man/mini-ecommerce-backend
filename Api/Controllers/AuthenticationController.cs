@@ -88,7 +88,7 @@ public class AuthenticationController : ControllerBase
         try
         {
             // Get session ID from cookie
-            var sessionId = Request.Cookies["sessionId"];
+            var sessionId = HttpContext.Items["sessionId"]?.ToString();
 
             if (string.IsNullOrEmpty(sessionId))
             {
@@ -100,6 +100,7 @@ public class AuthenticationController : ControllerBase
 
             // Delete cookie
             Response.Cookies.Delete("sessionId");
+            Response.Cookies.Delete("SessionId");
 
             return Ok(new { message = "Logout successful" });
         }

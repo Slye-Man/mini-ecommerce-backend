@@ -117,7 +117,7 @@ public class AuthService : IAuthService
         if (session.ExpiresAt < DateTime.UtcNow)
         {
             _sessions.TryRemove(sessionId, out _);
-            return Task.FromResult(true);
+            return Task.FromResult(false);
         }
         
         return Task.FromResult(true);
