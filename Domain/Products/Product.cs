@@ -21,6 +21,9 @@ public class Product
 
     [Required]
     public int StockQuantity { get; set; }
+    
+    [Required]
+    public string? Category { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
