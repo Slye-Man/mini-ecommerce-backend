@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Api.DTO;
+namespace Application.DTO;
 
 public class LoginRequestDTO
 {

@@ -1,6 +1,7 @@
-using Api.DTO;
+using Application.DTO;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
