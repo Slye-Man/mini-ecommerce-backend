@@ -1,4 +1,4 @@
-namespace Api.DTO;
+namespace Application.DTO;
 
 public class UserProfileDTO
 {
