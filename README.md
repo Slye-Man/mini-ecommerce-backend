@@ -102,3 +102,5 @@ dotnet run
 ```
 Backend will run on `http://localhost:5129`
 
+# Disclaimer
+This software is provided for educational purposes only. The authors are not responsible for any misuse or damage caused by this software. Use at your own risk in controlled environments only.
