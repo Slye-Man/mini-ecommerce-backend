@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Api.DTO;
+using Application.DTO;
 using Domain;
 using Domain.Carts;
 using Domain.Users;
