@@ -42,6 +42,12 @@ builder.Services.AddCors(options =>
 // Implementing UserService
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Implementing ProductService
+builder.Services.AddScoped<IProductService, ProductService>();
+
+// Implementing CartService
+builder.Services.AddScoped<ICartService, CartService>();
+
 var app = builder.Build();
 
 // Creating database if it does not exist

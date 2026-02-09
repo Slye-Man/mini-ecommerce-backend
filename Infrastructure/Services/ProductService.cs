@@ -1,6 +1,7 @@
 using Domain;
 using Domain.Products;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
