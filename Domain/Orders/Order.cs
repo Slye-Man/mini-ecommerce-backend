@@ -34,6 +34,9 @@ public class Order
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal TotalAmount { get; set; }
+
     public virtual User? User { get; set; }
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
