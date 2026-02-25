@@ -25,6 +25,10 @@ public class OrderItem
     [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
 
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal PriceAtPurchase { get; set; }
+
     public virtual Order? Order { get; set; }
     public virtual Product? Product { get; set; }
 }

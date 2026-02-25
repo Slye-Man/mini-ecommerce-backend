@@ -48,6 +48,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 // Implementing CartService
 builder.Services.AddScoped<ICartService, CartService>();
 
+// Implementing OrderService
+builder.Services.AddScoped<IOrderService, OrderService>();
+
 var app = builder.Build();
 
 // Creating database if it does not exist
