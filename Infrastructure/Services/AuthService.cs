@@ -12,13 +12,13 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<AuthService> _logger;
-
-    private static readonly ConcurrentDictionary<string, SessionData> _sessions = new();
+    private readonly ISessionService _sessionService;
     
-    public AuthService(ApplicationDbContext context, ILogger<AuthService> logger)
+    public AuthService(ApplicationDbContext context, ILogger<AuthService> logger,  ISessionService sessionService)
     {
         _context = context;
         _logger = logger;
+        _sessionService = sessionService;
     }
 
     public async Task<AuthResponseDTO> RegisterUser(RegisterRequestDTO register)
@@ -84,16 +84,8 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid username or password.");
         }
 
-        // Create session
-        var sessionId = Guid.NewGuid().ToString();
-
-        var sessionData = new SessionData
-        {
-            UserId = user.UserId,
-            ExpiresAt = DateTime.UtcNow.AddHours(1) // Session valid for 1 hour
-        };
-        
-        _sessions[sessionId] = sessionData;
+        // Create session in database
+        var sessionId = await _sessionService.CreateSession(user.UserId);
 
         _logger.LogInformation("User logged in: {Username}", user.UserName);
 
@@ -106,58 +98,31 @@ public class AuthService : IAuthService
         };
     }
 
-    public Task<bool> ValidateSession(string sessionId)
+    public async Task<bool> ValidateSession(string sessionId)
     {
-        if (string.IsNullOrEmpty(sessionId))
-            return Task.FromResult(false);
-
-        if (!_sessions.TryGetValue(sessionId, out var session))
-            return Task.FromResult(false);
-
-        if (session.ExpiresAt < DateTime.UtcNow)
-        {
-            _sessions.TryRemove(sessionId, out _);
-            return Task.FromResult(false);
-        }
-        
-        return Task.FromResult(true);
+        return await _sessionService.ValidateSession(sessionId);
     }
 
-    public Task<User> GetUserBySession(string sessionId)
+    public async Task<User> GetUserBySession(string sessionId)
     {
-        if (string.IsNullOrEmpty(sessionId) || !_sessions.TryGetValue(sessionId, out var session))
-            return Task.FromResult<User>(null);
+        var userId = await _sessionService.GetUserIdFromSession(sessionId);
         
-        if (session.ExpiresAt < DateTime.UtcNow)
-        {
-            _sessions.TryRemove(sessionId, out _);
-            return Task.FromResult<User>(null);
-        }
+        if (!userId.HasValue)
+            return null;
         
-        //return user from database
-        return _context.Users.FirstOrDefaultAsync(u => u.UserId == session.UserId);
+        return await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
-    public Task<bool> LogoutUser(string sessionId)
+    public async Task<bool> LogoutUser(string sessionId)
     {
         if (string.IsNullOrEmpty(sessionId))
-            return Task.FromResult(false);
+            return false;
         
-        var removed = _sessions.TryRemove(sessionId, out _);
+        var removed = await _sessionService.DeleteSession(sessionId);
         
         if (removed)
             _logger.LogInformation("User logged out, sessionId: {SessionId}", sessionId);
         
-        return Task.FromResult(removed);
-    }
-
-    private class SessionData
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ExpiresAt { get; set; }
-        
+        return removed;
     }
 }
