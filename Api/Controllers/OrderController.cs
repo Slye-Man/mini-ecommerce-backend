@@ -17,6 +17,14 @@ namespace Api.Controllers;
             _logger = logger;
         }
 
+        private int GetCurrentUserId()
+        {
+            if (HttpContext.Items["UserId"] is int userId)
+                return userId;
+            
+            throw new UnauthorizedAccessException("User is not authenticated!");
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO createOrderDTO)
         {
@@ -32,8 +40,8 @@ namespace Api.Controllers;
                     return BadRequest(ModelState);
                 }
 
-                // TODO: Get actual userId from session
-                int userId = 1;
+                // Get userId from session
+                int userId = GetCurrentUserId();
 
                 var order = await _orderService.CreateOrder(userId, createOrderDTO);
                 return Ok(order);
@@ -63,8 +71,7 @@ namespace Api.Controllers;
                     return Unauthorized(new { message = "Not authenticated" });
                 }
 
-                // TODO: Get actual userId from session
-                int userId = 1;
+                int userId = GetCurrentUserId();
 
                 var orders = await _orderService.GetUserOrders(userId);
                 return Ok(orders);
@@ -86,8 +93,7 @@ namespace Api.Controllers;
                     return Unauthorized(new { message = "Not authenticated" });
                 }
 
-                // TODO: Get actual userId from session
-                int userId = 1;
+                int userId = GetCurrentUserId();
 
                 var order = await _orderService.GetOrderDetails(userId, orderId);
                 return Ok(order);
@@ -113,8 +119,7 @@ namespace Api.Controllers;
                     return Unauthorized(new { message = "Not authenticated" });
                 }
 
-                // TODO: Get actual userId from session
-                int userId = 1;
+                int userId = GetCurrentUserId();
 
                 var order = await _orderService.CancelOrder(userId, orderId);
                 return Ok(order);
