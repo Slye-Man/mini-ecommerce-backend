@@ -16,6 +16,14 @@ public class CartController : ControllerBase
         _cartService = cartService;
         _logger = logger;
     }
+    
+    private int GetCurrentUserId()
+    {
+        if (HttpContext.Items["UserId"] is int userId)
+            return userId;
+        
+        throw new UnauthorizedAccessException("User not authenticated");
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetCart()
@@ -27,8 +35,7 @@ public class CartController : ControllerBase
                 return Unauthorized(new { message = "Not authenticated" });
             }
 
-            // TODO: Get actual userId from session
-            int userId = 1;
+            int userId = GetCurrentUserId();
 
             var cart = await _cartService.GetUserCart(userId);
             return Ok(cart);
@@ -59,8 +66,7 @@ public class CartController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            // TODO: Get actual userId from session
-            int userId = 1;
+            int userId = GetCurrentUserId();
 
             var cart = await _cartService.AddToCart(userId, addToCartDTO);
             return Ok(cart);
@@ -95,8 +101,7 @@ public class CartController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            // TODO: Get actual userId from session
-            int userId = 1;
+            int userId = GetCurrentUserId();
 
             var cart = await _cartService.UpdateCartItem(userId, cartItemId, updateDTO);
             return Ok(cart);
@@ -126,8 +131,7 @@ public class CartController : ControllerBase
                 return Unauthorized(new { message = "Not authenticated" });
             }
 
-            // TODO: Get actual userId from session
-            int userId = 1;
+            int userId = GetCurrentUserId();
 
             var cart = await _cartService.RemoveFromCart(userId, cartItemId);
             return Ok(cart);
@@ -153,8 +157,7 @@ public class CartController : ControllerBase
                 return Unauthorized(new { message = "Not authenticated" });
             }
 
-            // TODO: Get actual userId from session
-            int userId = 1; 
+            int userId = GetCurrentUserId();
 
             await _cartService.ClearCart(userId);
             return Ok(new { message = "Cart cleared successfully" });

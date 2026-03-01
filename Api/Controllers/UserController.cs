@@ -17,6 +17,14 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
+    private int GetCurrentUserId()
+    {
+        if (HttpContext.Items["UserId"] is int userId) 
+            return userId;
+        
+        throw new UnauthorizedAccessException("User not authenticated!");
+    }
+
     [HttpGet("profile")]
     public async Task<IActionResult> GetUserProfile()
     {
@@ -24,12 +32,8 @@ public class UserController : ControllerBase
         if (HttpContext.Items["isAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
         
-        // TODO: Get userId from browser session
-        // Using mock userID
-        var sessionId = HttpContext.Items["SessionId"] as string;
-        
-        // Mock UserID
-        int userId = 1;
+        // Getting userId from middleware
+        int userId = GetCurrentUserId();
 
         var profile = await _userService.GetUserProfile(userId);
         return Ok(profile);
@@ -41,7 +45,7 @@ public class UserController : ControllerBase
         if (HttpContext.Items["isAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
 
-        int userId = 1;
+        int userId = GetCurrentUserId();
         
         var updatedProfile = await _userService.UpdateUserProfile(userId, updateDTO);
         return Ok(updatedProfile);
@@ -57,7 +61,7 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         
-        int userId = 1;
+        int userId = GetCurrentUserId();
         
         await _userService.ChangePassword(userId, changePasswordDTO);
         return Ok();
@@ -69,7 +73,7 @@ public class UserController : ControllerBase
         if (HttpContext.Items["isAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
 
-        int userId = 1;
+        int userId = GetCurrentUserId();
 
         await _userService.DeleteAccount(userId);
         
