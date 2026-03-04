@@ -73,7 +73,7 @@ public class AuthenticationController : ControllerBase
                 Response.Cookies.Append("SessionId", user.SessionId, cookieOptions);
             }
             
-            return Ok(new { Message = "Login successful", UserId = user.UserId });
+            return Ok(new { Message = "Login successful", UserId = user.UserId, UserName = user.UserName });
         }
         catch (UnauthorizedAccessException)
         {

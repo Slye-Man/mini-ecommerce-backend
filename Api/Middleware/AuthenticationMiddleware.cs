@@ -32,7 +32,7 @@ public class AuthenticationMiddleware
                 {
                     // Store session and user information for controllers
                     context.Items["sessionId"] = sessionId;
-                    context.Items["isAuthenticated"] = true;
+                    context.Items["IsAuthenticated"] = true;
                     context.Items["User"] = user;
                     context.Items["UserId"] = user.UserId;
                 }
