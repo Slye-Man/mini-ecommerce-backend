@@ -29,7 +29,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserProfile()
     {
         // Authentication via Middleware
-        if (HttpContext.Items["isAuthenticated"] as bool? != true)
+        if (HttpContext.Items["IsAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
         
         // Getting userId from middleware
@@ -42,7 +42,7 @@ public class UserController : ControllerBase
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateUserProfile(UpdateProfileDTO updateDTO)
     {
-        if (HttpContext.Items["isAuthenticated"] as bool? != true)
+        if (HttpContext.Items["IsAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
 
         int userId = GetCurrentUserId();
@@ -55,7 +55,7 @@ public class UserController : ControllerBase
     [HttpPut("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
     {
-        if (HttpContext.Items["isAuthenticated"] as bool? != true)
+        if (HttpContext.Items["IsAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
         
         if (!ModelState.IsValid)
@@ -70,7 +70,7 @@ public class UserController : ControllerBase
     [HttpDelete("account")]
     public async Task<IActionResult> DeleteAccount()
     {
-        if (HttpContext.Items["isAuthenticated"] as bool? != true)
+        if (HttpContext.Items["IsAuthenticated"] as bool? != true)
             return Unauthorized(new { message = "Not Authenticated" });
 
         int userId = GetCurrentUserId();
